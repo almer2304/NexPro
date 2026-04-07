@@ -1,191 +1,384 @@
-# NexPro — Indonesia's Premium Property Marketplace
+<div align="center">
 
-Built with **Next.js 15** (App Router) · **TypeScript** · **Tailwind CSS** · **Supabase** · **Zustand** · **Framer Motion**
+<img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80&auto=format&fit=crop" alt="NexPro Banner" width="100%" style="border-radius: 12px; max-height: 300px; object-fit: cover;" />
+
+<br />
+<br />
+
+# NexPro
+
+**Marketplace Properti Premium Indonesia**
+
+NexPro menghubungkan jutaan pencari properti dengan agen-agen terpercaya di seluruh Indonesia — dari Jakarta hingga Bali, dari Bandung hingga Makassar.
+
+<br />
+
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?style=flat-square&logo=supabase)](https://supabase.com)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-11-0055ff?style=flat-square&logo=framer)](https://www.framer.com/motion)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+
+<br />
+
+[**Demo Live**](http://localhost:3000) · [**Dokumentasi**](#-quick-start) · [**Lapor Bug**](#) · [**Request Fitur**](#)
+
+</div>
+
+---
+
+## ✨ Fitur Utama
+
+| Kategori | Fitur |
+|----------|-------|
+| 🔍 **Pencarian** | Filter multi-kriteria (kota, tipe, harga, kamar), view grid & peta interaktif |
+| 🏠 **Listing** | Galeri foto fullscreen, kalkulator KPR, peta Leaflet, bagikan via link |
+| 👤 **Autentikasi** | Signup/Login, reset password, role-based (agent vs customer) |
+| 🏢 **Dashboard Agent** | Kelola listing, status properti (terjual/disewa), analitik view & inquiry |
+| 💬 **Komunikasi** | Form inquiry, kontak via WhatsApp langsung dari halaman properti |
+| ❤️ **Wishlist** | Simpan properti favorit dengan optimistic UI |
+| ⚖️ **Bandingkan** | Side-by-side comparison hingga 3 properti |
+| 🌙 **Dark Mode** | Toggle light/dark dengan Zustand state persistence |
+| 📱 **Responsif** | Mobile-first, sidebar collapsible, drawer navigasi |
+| ⚡ **Performa** | Server Components, streaming SSR, loading skeletons |
+
+---
+
+## 🛠️ Tech Stack
+
+```
+Frontend          Next.js 15 (App Router) + TypeScript
+Styling           Tailwind CSS + Framer Motion (animasi)
+Backend           Supabase (PostgreSQL + Auth + Storage + RLS)
+State             Zustand (favorites, compare, dark mode)
+Forms             React Hook Form + Zod validation
+Maps              Leaflet.js (vanilla, no peer dep issues)
+Icons             Lucide React
+Fonts             Plus Jakarta Sans + Inter (via next/font)
+```
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Install dependencies
+### Prasyarat
+
+- **Node.js** ≥ 18.17
+- **npm** ≥ 9
+- Akun [Supabase](https://supabase.com) (gratis)
+
+### 1. Clone & Install
+
 ```bash
+git clone https://github.com/username/nexpro.git
+cd nexpro
 npm install
 ```
 
-### 2. Configure environment
-Copy `.env.local` and fill in your Supabase credentials:
+### 2. Setup Environment
+
+Buat file `.env.local` di root project:
+
 ```bash
+# ── Supabase (Wajib) ─────────────────────────────────────────
+# Supabase Dashboard → Settings → API
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_public_key
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...YOUR_ANON_KEY
 
-# Only needed for the Node seed script (Option B below)
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+# ── Service Role (hanya untuk seed script) ───────────────────
+# Supabase Dashboard → Settings → API → service_role secret
+SUPABASE_SERVICE_ROLE_KEY=eyJ...YOUR_SERVICE_ROLE_KEY
+
+# ── App ──────────────────────────────────────────────────────
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### 3. Seed the database (choose one)
+### 3. Setup Database Supabase
 
-#### ✅ Option A — SQL Editor (Recommended, no extra keys needed)
-1. Open **Supabase Dashboard → SQL Editor → New Query**
-2. Paste the entire contents of `scripts/seed.sql`
-3. Click **Run**
-4. Done! 10 listings will appear immediately.
+Jalankan script berikut secara **berurutan** di **Supabase → SQL Editor → New Query**:
 
-#### Option B — Node script
-```bash
-# Requires SUPABASE_SERVICE_ROLE_KEY in .env.local
-npm run seed
+| Urutan | File | Deskripsi |
+|--------|------|-----------|
+| 1 | `scripts/fix-rls-final.sql` | Buat skema tabel + RLS policies |
+| 2 | `scripts/migrate-v3.sql` | Auth trigger + tabel chat |
+| 3 | `scripts/migrate-v4.sql` | Kolom `rent_period` + `property_status` |
+| 4 | `scripts/enable-realtime.sql` | Aktifkan Supabase Realtime |
+| 5 | `scripts/seed-agents.sql` | Seed 5 agent + 50 properti |
+
+> **⚠️ Penting:** Pada `fix-rls-final.sql`, ganti `EMAIL_KAMU@gmail.com` dengan email akun kamu sebelum Run.
+
+### 4. Setup Supabase Storage
+
+Di **Supabase Dashboard → Storage**:
+
+1. Buat bucket baru bernama `property-images` (set ke **Public**)
+2. Tambahkan policies berikut di tab **Policies**:
+
+```sql
+-- Allow authenticated users to upload
+CREATE POLICY "Allow authenticated uploads"
+ON storage.objects FOR INSERT
+TO authenticated WITH CHECK (bucket_id = 'property-images');
+
+-- Allow public to view
+CREATE POLICY "Allow public read"
+ON storage.objects FOR SELECT
+TO public USING (bucket_id = 'property-images');
 ```
 
-### 4. Run the dev server
+### 5. Setup Supabase Auth
+
+Di **Supabase Dashboard → Authentication → URL Configuration**:
+
+```
+Site URL:      http://localhost:3000
+Redirect URLs: http://localhost:3000/auth/callback
+```
+
+### 6. Jalankan Dev Server
+
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Buka [http://localhost:3000](http://localhost:3000) 🎉
 
 ---
 
-## 📁 Project Structure
+## 📁 Struktur Project
 
 ```
-src/
-├── app/
-│   ├── (auth)/               # Login & Signup with glassmorphism layout
-│   │   ├── login/page.tsx
-│   │   └── signup/page.tsx
-│   ├── auth/callback/        # Supabase email verification handler
-│   ├── dashboard/            # Protected agent/user dashboard
-│   │   ├── page.tsx          # Overview with live stats
-│   │   ├── listings/         # Agent listing management table
-│   │   ├── inquiries/        # Lead management with status controls
-│   │   ├── saved/            # User wishlist
-│   │   ├── new-listing/      # 3-step listing creation form
-│   │   └── edit/[id]/        # Edit existing listing
-│   ├── properties/[slug]/    # Full property detail page
-│   │   ├── page.tsx          # Server Component (SEO)
-│   │   ├── image-gallery.tsx # Interactive lightbox gallery
-│   │   └── inquiry-section.tsx # Auth-aware inquiry form
-│   ├── search/               # Property search + filters
-│   │   ├── page.tsx          # Server Component
-│   │   └── search-controls.tsx # Client filter bar
-│   ├── saved/                # Public saved properties page
-│   └── page.tsx              # Landing page
+nexpro/
+├── scripts/                    # SQL migrations & seeders
+│   ├── fix-rls-final.sql       # Schema + RLS policies
+│   ├── migrate-v3.sql          # Auth trigger update
+│   ├── migrate-v4.sql          # rent_period + property_status
+│   ├── enable-realtime.sql     # Supabase Realtime setup
+│   └── seed-agents.sql         # 5 agents × 10 properties
 │
-├── components/
-│   ├── ui/                   # Atomic: Button, Input, Badge, Skeleton, Toast
-│   ├── shared/               # Navbar (transparent/scrolled), Footer
-│   └── modules/              # PropertyCard, FilterBar, FavoriteButton
-│
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts         # Browser client
-│   │   ├── server.ts         # Server Component client
-│   │   ├── middleware.ts     # Session management
-│   │   └── actions.ts        # All Server Actions (15 functions)
-│   ├── stores/index.ts       # Zustand: favorites, search filters, UI
-│   ├── validations/index.ts  # Zod schemas
-│   └── utils.ts              # formatPrice, formatArea, timeAgo, cn
-│
-├── middleware.ts              # Route protection for /dashboard
-└── types/index.ts             # TypeScript types matching Supabase schema
+└── src/
+    ├── app/
+    │   ├── (auth)/             # Login, Signup, Forgot Password
+    │   ├── auth/callback/      # Supabase email verification handler
+    │   ├── dashboard/          # Protected dashboard (agent & customer)
+    │   │   ├── listings/       # Kelola listing + status properti
+    │   │   ├── analytics/      # Statistik view & inquiry per properti
+    │   │   ├── inquiries/      # Manajemen pesan masuk
+    │   │   ├── saved/          # Wishlist tersimpan
+    │   │   ├── new-listing/    # Form 3-step buat listing baru
+    │   │   ├── edit/[id]/      # Edit listing yang ada
+    │   │   └── profile/        # Edit profil + upload avatar
+    │   ├── properties/[slug]/  # Halaman detail properti (SSR)
+    │   ├── search/             # Pencarian + filter + peta
+    │   ├── compare/            # Bandingkan properti
+    │   ├── saved/              # Halaman wishlist publik
+    │   ├── about/              # Tentang Kami
+    │   ├── privacy/            # Kebijakan Privasi
+    │   └── terms/              # Syarat & Ketentuan
+    │
+    ├── components/
+    │   ├── ui/                 # Atom: Button, Input, Badge, Toast, Skeleton
+    │   ├── shared/             # Navbar, Footer, NavigationProgress
+    │   └── modules/            # PropertyCard, KPR Calculator, PropertyMap,
+    │                           # FavoriteButton, CompareBar, ShareButton
+    │
+    ├── lib/
+    │   ├── supabase/
+    │   │   ├── client.ts       # Browser Supabase client
+    │   │   ├── server.ts       # Server Component client
+    │   │   ├── middleware.ts   # Session refresh
+    │   │   └── actions.ts      # Server Actions (30+ fungsi)
+    │   ├── stores/index.ts     # Zustand stores
+    │   ├── validations/        # Zod schemas
+    │   └── utils.ts            # formatPrice, formatArea, timeAgo, cn
+    │
+    ├── middleware.ts            # Proteksi route /dashboard
+    └── types/index.ts          # TypeScript types lengkap
 ```
 
 ---
 
-## 🌱 Seed Data
+## 🗄️ Database Schema
 
-The seed script creates **10 realistic Indonesian property listings**:
+```sql
+profiles          -- Data pengguna (sync dari auth.users via trigger)
+properties        -- Listing properti dengan rent_period & property_status
+favorites         -- Properti tersimpan per user
+inquiries         -- Pesan dari calon pembeli ke agen
+property_views    -- Tracking view per properti untuk analitik
+notifications     -- Notifikasi sistem
+```
 
-| # | Title | City | Type | Price |
-|---|-------|------|------|-------|
-| 1 | Modern Minimalist House in Kemang | Jakarta | House / Sale | Rp 15.5M |
-| 2 | Luxury Penthouse at Sudirman CBD | Jakarta | Apartment / Sale | Rp 45M |
-| 3 | Tropical Garden House in Pondok Indah | Jakarta | House / Sale | Rp 28M |
-| 4 | Serviced Apartment for Rent — SCBD | Jakarta | Apartment / Rent | Rp 18Jt/mo |
-| 5 | Clifftop Villa with Infinity Pool, Uluwatu | Bali | House / Sale | Rp 32M |
-| 6 | Rice Terrace Villa for Rent in Ubud | Bali | House / Rent | Rp 65Jt/mo |
-| 7 | Beachfront Land Plot in Canggu | Bali | Land / Sale | Rp 55M |
-| 8 | Boutique Villa Complex in Seminyak | Bali | House / Sale | Rp 85M |
-| 9 | Mountain-View House in Dago Pakar | Bandung | House / Sale | Rp 8.5M |
-| 10 | Contemporary Townhouse in Buah Batu | Bandung | House / Rent | Rp 12Jt/mo |
+### Kolom Penting di `properties`
 
-All images use high-quality **Unsplash** URLs.
-
----
-
-## 🔐 Authentication Flow
-
-1. User signs up at `/signup` (role: `customer` or `agent`)
-2. Supabase triggers `handle_new_user()` → creates profile in `public.profiles`
-3. Email verification link → hits `/auth/callback` → redirects to `/dashboard`
-4. `middleware.ts` protects `/dashboard` — unauthenticated users → `/login`
-
-### Auth-Aware Features
-- **Favorites**: Optimistic UI via Zustand + server toggle via `toggleFavorite()` action. Shows login prompt if unauthenticated.
-- **Inquiries**: `InquirySection` shows login CTA for guests, form for authenticated users. `buyer_id` is automatically set from `auth.getUser()` — never from client input.
-- **Dashboard**: Sidebar adapts to `agent` vs `customer` role. Agents see Listings + New Listing nav items.
+| Kolom | Tipe | Keterangan |
+|-------|------|------------|
+| `listing_type` | `sale` \| `rent` | Jenis listing |
+| `rent_period` | `day` \| `week` \| `month` | Periode sewa (harian/mingguan/bulanan) |
+| `property_status` | `available` \| `sold` \| `rented` | Status ketersediaan |
+| `is_published` | `boolean` | Tampil di pencarian atau tidak |
+| `is_featured` | `boolean` | Tampil di homepage |
 
 ---
 
-## 🗄️ Supabase Configuration Checklist
+## 👥 Role & Akses
 
-### Tables (run the provided schema SQL)
-- [x] `profiles` — synced from `auth.users` via trigger
-- [x] `properties` — with `slug` unique constraint
-- [x] `favorites` — unique `(user_id, property_id)`
-- [x] `inquiries`
+```
+customer  →  Cari properti, simpan favorit, kirim inquiry, bandingkan
+agent     →  Semua customer + buat/edit/hapus listing, ubah status
+              properti, lihat analitik, kelola pesan masuk
+```
 
-### RLS Policies
-- [x] `profiles`: public SELECT, owner UPDATE
-- [x] `properties`: published SELECT for all, ALL for owner agent
-- [x] `favorites`: ALL for owner
-- [x] `inquiries`: buyer SELECT/INSERT, agent SELECT for their properties
-
-### Storage
-- [x] Bucket: `property-images` (public)
-- [x] Policy: authenticated users can upload to their own folder (`{user_id}/*`)
-
-### Auth Settings
-- Set **Site URL**: `http://localhost:3000` (dev) / your production URL
-- Set **Redirect URLs**: `http://localhost:3000/auth/callback`
+### Cara set role agent
+Setelah signup, jalankan di SQL Editor:
+```sql
+UPDATE public.profiles
+SET role = 'agent'
+WHERE id = (SELECT id FROM auth.users WHERE email = 'emailkamu@gmail.com');
+```
 
 ---
 
 ## 🎨 Design System
 
-| Token | Value |
-|-------|-------|
-| Primary | `#000802` (Deep Navy) |
-| Accent | `#10b981` (Emerald) |
-| Secondary text | `#476083` (Slate Blue) |
-| Surface | `#f8f9fa` |
-| Border | `#e1e3e4` |
-| Fonts | Plus Jakarta Sans + Inter |
+<table>
+<tr>
+<td>
+
+**Warna**
+| Token | Hex | Penggunaan |
+|-------|-----|------------|
+| Primary | `#000802` | CTA, nav aktif, teks utama |
+| Emerald | `#10b981` | Accent, badge, highlight |
+| Slate | `#476083` | Teks sekunder |
+| Surface | `#f8f9fa` | Background halaman |
+| Border | `#e1e3e4` | Garis pembatas |
+
+</td>
+<td>
+
+**Tipografi**
+| Font | Penggunaan |
+|------|------------|
+| Plus Jakarta Sans | Heading, tombol |
+| Inter | Label, metadata |
+
+**Animasi**
+| Jenis | Library |
+|-------|---------|
+| Page transition | Framer Motion |
+| Loading state | Tailwind animate |
+| Sidebar collapse | Framer Motion |
+
+</td>
+</tr>
+</table>
 
 ---
 
-## 📦 Key Dependencies
-
-| Package | Purpose |
-|---------|---------|
-| `@supabase/ssr` | SSR-compatible Supabase client |
-| `zustand` | Favorites + filter global state |
-| `react-hook-form` | All forms |
-| `zod` | Schema validation |
-| `framer-motion` | Page transitions, gallery, filter animations |
-| `lucide-react` | All icons |
-| `tailwindcss-animate` | CSS animation utilities |
-
----
-
-## 🚢 Deployment (Vercel)
+## 🚢 Deployment ke Vercel
 
 ```bash
-# 1. Push to GitHub
-# 2. Import project in Vercel
-# 3. Add environment variables:
+# 1. Push ke GitHub
+git add . && git commit -m "feat: initial deployment" && git push
+
+# 2. Import project di vercel.com
+# 3. Tambahkan environment variables di Vercel:
 #    NEXT_PUBLIC_SUPABASE_URL
 #    NEXT_PUBLIC_SUPABASE_ANON_KEY
-# 4. Deploy
+#    SUPABASE_SERVICE_ROLE_KEY
+#    NEXT_PUBLIC_APP_URL (URL production kamu)
+
+# 4. Deploy → Vercel auto-detects Next.js
 ```
 
-Update Supabase Auth → Site URL and Redirect URLs to your production domain.
+Setelah deploy, update **Supabase Auth → URL Configuration**:
+```
+Site URL:      https://nexpro.vercel.app
+Redirect URLs: https://nexpro.vercel.app/auth/callback
+```
+
+---
+
+## 📦 Dependencies Utama
+
+| Package | Versi | Kegunaan |
+|---------|-------|----------|
+| `next` | 15.x | Framework React |
+| `@supabase/ssr` | latest | Supabase SSR client |
+| `zustand` | 5.x | Global state management |
+| `react-hook-form` | 7.x | Form handling |
+| `zod` | 3.x | Schema validation |
+| `framer-motion` | 11.x | Animasi & transisi |
+| `leaflet` | 1.9.x | Peta interaktif |
+| `lucide-react` | 0.4xx | Icon library |
+| `tailwindcss` | 3.x | Utility-first CSS |
+
+---
+
+## 🔧 Scripts
+
+```bash
+npm run dev       # Development server (localhost:3000)
+npm run build     # Production build
+npm run start     # Jalankan production build
+npm run lint      # ESLint check
+```
+
+---
+
+## 🐛 Troubleshooting
+
+<details>
+<summary><strong>❌ "Failed to fetch" saat login</strong></summary>
+
+File `.env.local` tidak terbaca. Pastikan:
+- File ada di root project (sama level dengan `package.json`)
+- Tidak ada spasi di sekitar `=`
+- Restart dev server setelah mengubah `.env.local`
+
+</details>
+
+<details>
+<summary><strong>❌ Listing tidak bisa disimpan (RLS error)</strong></summary>
+
+Role akun belum di-set ke `agent`. Jalankan:
+```sql
+UPDATE public.profiles SET role = 'agent'
+WHERE id = (SELECT id FROM auth.users WHERE email = 'emailkamu@gmail.com');
+```
+
+</details>
+
+<details>
+<summary><strong>❌ Upload foto gagal</strong></summary>
+
+Storage bucket belum ada atau policy belum dibuat. Pastikan:
+1. Bucket `property-images` sudah dibuat dan di-set **Public**
+2. Policy INSERT untuk `authenticated` sudah ditambahkan
+
+</details>
+
+<details>
+<summary><strong>❌ Hydration error di browser</strong></summary>
+
+Biasanya disebabkan browser extension (password manager, dll.) yang menambahkan attribute ke form. Ini bukan bug kode — coba buka di Incognito mode untuk konfirmasi.
+
+</details>
+
+---
+
+## 📄 Lisensi
+
+Didistribusikan di bawah lisensi **MIT**. Lihat [`LICENSE`](LICENSE) untuk informasi lengkap.
+
+---
+
+<div align="center">
+
+Dibuat dengan ❤️ untuk pasar properti Indonesia
+
+**[NexPro](http://localhost:3000)** · [Tentang Kami](/about) · [Kebijakan Privasi](/privacy) · [Syarat & Ketentuan](/terms)
+
+</div>
