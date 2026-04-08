@@ -8,32 +8,40 @@ const SIDEBAR_KEY = "nexpro-sidebar-collapsed";
 export function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Sync with sidebar collapse state
   useEffect(() => {
-    const saved = localStorage.getItem(SIDEBAR_KEY);
-    setCollapsed(saved === "true");
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
 
-    // Listen for storage changes (when sidebar toggles)
-    const handler = () => {
-      const val = localStorage.getItem(SIDEBAR_KEY);
-      setCollapsed(val === "true");
+    const sync = () => {
+      setCollapsed(localStorage.getItem(SIDEBAR_KEY) === "true");
     };
-    window.addEventListener("storage", handler);
+    sync();
+    setMounted(true);
 
-    // Also poll every 100ms for same-tab updates
-    const interval = setInterval(handler, 100);
+    const interval = setInterval(sync, 150);
+    window.addEventListener("storage", sync);
     return () => {
-      window.removeEventListener("storage", handler);
       clearInterval(interval);
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("resize", checkMobile);
     };
   }, []);
 
+  // Mobile: no left margin (drawer sidebar), just top padding for the mobile top bar
+  // Desktop: left margin matches sidebar width (256 expanded / 72 collapsed)
+  const desktopMargin = collapsed ? 72 : 256;
+
   return (
     <motion.main
-      animate={{ marginLeft: collapsed ? 72 : 256 }}
+      animate={mounted && !isMobile ? { marginLeft: desktopMargin } : { marginLeft: 0 }}
+      initial={false}
       transition={{ duration: 0.25, ease: "easeInOut" }}
-      className="flex-1 min-w-0 mt-14 md:mt-0 hidden md:block"
+      // pt-14 = mobile top bar height (56px), md:pt-0 because desktop has no top bar
+      className="flex-1 min-w-0 w-full pt-14 md:pt-0"
     >
       <AnimatePresence mode="wait">
         <motion.div
@@ -48,24 +56,5 @@ export function DashboardContent({ children }: { children: React.ReactNode }) {
         </motion.div>
       </AnimatePresence>
     </motion.main>
-  );
-}
-
-// Mobile content (no margin needed, uses pt-14 for top bar)
-export function DashboardMobileContent({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -6 }}
-        transition={{ duration: 0.2 }}
-        className="md:hidden mt-14 px-4 py-6"
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
   );
 }

@@ -24,14 +24,14 @@ export default async function DashboardPage() {
 
   const stats = isAgent
     ? [
-        { label: "Total Listings", value: properties.length, icon: Building2, color: "bg-navy-50 text-navy-900", trend: "+2 this month" },
-        { label: "Published", value: publishedCount, icon: Eye, color: "bg-emerald-50 text-emerald-700", trend: `${properties.length - publishedCount} drafts` },
-        { label: "Inquiries", value: inquiries.length, icon: MessageSquare, color: "bg-blue-50 text-blue-700", trend: `${pendingInquiries} pending` },
-        { label: "Saved", value: favorites.length, icon: Heart, color: "bg-red-50 text-red-700", trend: "Your wishlist" },
+        { label: "Total Listing", value: properties.length, icon: Building2, color: "bg-navy-50 text-navy-900", trend: "+2 bulan ini" },
+        { label: "Dipublikasi", value: publishedCount, icon: Eye, color: "bg-emerald-50 text-emerald-700", trend: `${properties.length - publishedCount} draft` },
+        { label: "Pesan Masuk", value: inquiries.length, icon: MessageSquare, color: "bg-blue-50 text-blue-700", trend: `${pendingInquiries} pending` },
+        { label: "Tersimpan", value: favorites.length, icon: Heart, color: "bg-red-50 text-red-700", trend: "Wishlist kamu" },
       ]
     : [
-        { label: "Saved Properties", value: favorites.length, icon: Heart, color: "bg-red-50 text-red-700", trend: "Your wishlist" },
-        { label: "Inquiries Sent", value: inquiries.length, icon: MessageSquare, color: "bg-blue-50 text-blue-700", trend: "Total messages" },
+        { label: "Properti Tersimpan", value: favorites.length, icon: Heart, color: "bg-red-50 text-red-700", trend: "Wishlist kamu" },
+        { label: "Pesan Terkirim", value: inquiries.length, icon: MessageSquare, color: "bg-blue-50 text-blue-700", trend: "Total pesan" },
       ];
 
   return (
@@ -39,8 +39,8 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#000802]">
-            Good morning, {profile?.full_name?.split(" ")[0] ?? "there"} 👋
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#000802] dark:text-white">
+            Selamat datang, {profile?.full_name?.split(" ")[0] ?? "pengguna"} 👋
           </h1>
           <p className="text-[#476083] font-label mt-1">
             {new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
@@ -48,7 +48,7 @@ export default async function DashboardPage() {
         </div>
         {isAgent && (
           <Link href="/dashboard/new-listing">
-            <Button size="sm" variant="emerald">+ New Listing</Button>
+            <Button size="sm" variant="emerald">+ Listing Baru</Button>
           </Link>
         )}
       </div>
@@ -56,7 +56,7 @@ export default async function DashboardPage() {
       {/* Stats Grid */}
       <div className={`grid grid-cols-2 ${isAgent ? "lg:grid-cols-4" : "lg:grid-cols-2"} gap-4`}>
         {stats.map(({ label, value, icon: Icon, color, trend }) => (
-          <div key={label} className="bg-white rounded-2xl p-6 border border-[#e1e3e4]">
+          <div key={label} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-[#e1e3e4] dark:border-slate-800">
             <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center mb-4`}>
               <Icon size={20} />
             </div>

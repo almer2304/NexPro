@@ -54,7 +54,7 @@ export function DashboardSidebar({ profile }: { profile: Profile | null }) {
       initial={false}
       animate={{ width: collapsed ? 72 : 256 }}
       transition={{ duration: 0.25, ease: "easeInOut" }}
-      className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 bg-white dark:bg-slate-900 border-r border-[#e1e3e4] dark:border-slate-800 z-40 overflow-hidden"
+      className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 bg-white dark:bg-slate-900 border-r border-[#e1e3e4] dark:border-slate-800 z-40 overflow-hidden shadow-sm"
     >
       {/* Logo + Collapse button */}
       <div className={`flex items-center border-b border-[#e1e3e4] dark:border-slate-800 h-14 ${collapsed ? "justify-center px-0" : "justify-between px-4"}`}>
