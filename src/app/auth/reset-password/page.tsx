@@ -23,7 +23,7 @@ const schema = z.object({
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [done, setDone] = useState(false);
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<{ password: string; confirm: string }>({
     resolver: zodResolver(schema),
   });
 

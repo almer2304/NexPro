@@ -1,4 +1,4 @@
-"use client";
+w"use client";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -37,12 +37,12 @@ export function ProfileForm({ profile, email }: ProfileFormProps) {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting, isDirty } } = useForm({
+  const { register, handleSubmit, formState: { errors, isSubmitting, isDirty } } = useForm<{ full_name: string; phone_number: string }>({
     resolver: zodResolver(profileSchema),
     defaultValues: { full_name: profile?.full_name ?? "", phone_number: profile?.phone_number ?? "" },
   });
 
-  const { register: regPwd, handleSubmit: handlePwd, reset: resetPwd, formState: { errors: pwdErrors, isSubmitting: isPwdSubmitting } } = useForm({
+  const { register: regPwd, handleSubmit: handlePwd, reset: resetPwd, formState: { errors: pwdErrors, isSubmitting: isPwdSubmitting } } = useForm<{ current_password: string; new_password: string; confirm_password: string }>({
     resolver: zodResolver(passwordSchema),
   });
 

@@ -15,7 +15,7 @@ const schema = z.object({ email: z.string().email("Please enter a valid email") 
 
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<{ email: string }>({
     resolver: zodResolver(schema),
   });
 
